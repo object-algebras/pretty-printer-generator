@@ -23,14 +23,25 @@ public class PPProcessor extends AbstractProcessor {
         filer = env.getFiler();
     }
 
+    private String[] toList(String message) {
+	return message.split(",");
+    }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations,
                            RoundEnvironment env) {
-	String folder = "pp";
+
+	String folder = "ppgen";
 	for (Element element : env.getElementsAnnotatedWith(PP.class)) {
+	    // Initialization.
+	    TypeMirror tm = element.asType();
+	    String typeArgs = tm.accept(new DeclaredTypeVisitor(), element);
+	    String[] lTypeArgs = toList(typeArgs);
+
 	    String name = element.getSimpleName().toString();
-	    String res = createPPClass(folder, element);
+	    String res = createPPClass(folder, (TypeElement) element,
+		    lTypeArgs, typeArgs);
+
 	    try {
 		JavaFileObject jfo;
 		jfo = filer.createSourceFile(folder + "/" + nameGenPP(name),
@@ -40,7 +51,7 @@ public class PPProcessor extends AbstractProcessor {
 		e.printStackTrace();
 	    }
 	}
-	
+
         return true;
     }
 
@@ -52,13 +63,20 @@ public class PPProcessor extends AbstractProcessor {
 	return e.getSimpleName().toString();
     }
 
-    private String createPPClass(String folder, Element e) {
-	String name = getName(e);
+    private String createPPClass(String folder, TypeElement te,
+	    String[] lTypeArgs, String typeArgs) {
+	String name = getName(te);
 	String res = "package " + folder + ";\n\n";
-	res += "import " + getPackage(e) + "." + name + ";\n\n";
+	res += "import " + getPackage(te) + "." + name + ";\n\n";
 	res += "public class " + nameGenPP(name) + " implements " + name
 		+ "<String> {\n";
-	// TODO: generate PP implementation methods.
+
+	List<? extends Element> le = te.getEnclosedElements();
+	for (Element e : le) {
+	    String methodName = e.getSimpleName().toString();
+	    String[] args = { methodName, typeArgs, name };
+	    res += e.asType().accept(new PrintMethodVisitor(), args);
+	}
 
 	res += "}";
 	return res;
