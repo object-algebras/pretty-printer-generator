@@ -3,6 +3,7 @@ package anno;
 import java.util.List;
 
 import javax.lang.model.type.*;
+import anno.utils.AnnoUtils;
 
 public class PrintMethodVisitor implements TypeVisitor<String, String[]> {
 
@@ -11,36 +12,25 @@ public class PrintMethodVisitor implements TypeVisitor<String, String[]> {
     public static final String TAB3 = "\t\t\t";
     public static final String TAB4 = "\t\t\t\t";
 
-    int arrayContains(String[] ls, String s) {
-	int i = 0;
-	for (String ts : ls) {
-	    if (s.equals(ts))
-		return i;
-	    i++;
-	}
-	return -1;
-    }
-
     @Override
     public String visitExecutable(ExecutableType t, String[] p) {
 	String methodName = p[0];
 	String[] lTypeArgs = p[1].split(",");
 	String[] lListTypeArgs = new String[lTypeArgs.length];
-	String algName = p[2];
+
 	for (int i = 0; i < lTypeArgs.length; ++i) {
 	    lListTypeArgs[i] = "java.util.List<" + lTypeArgs[i] + ">";
 	}
 
 	List<? extends TypeMirror> lp = t.getParameterTypes();
-	String returnType = t.getReturnType().toString();
 
 	String res = "\tpublic String " + methodName + "(";
 
 	for (int i = 0; i < lp.size(); ++i) {
 	    // contains a list of type variables
-	    if (arrayContains(lListTypeArgs, lp.get(i).toString()) != -1) {
+	    if (AnnoUtils.arrayContains(lListTypeArgs, lp.get(i).toString()) != -1) {
 		res += "java.util.List<String> p" + i;
-	    } else if (arrayContains(lTypeArgs, lp.get(i).toString()) != -1) {
+	    } else if (AnnoUtils.arrayContains(lTypeArgs, lp.get(i).toString()) != -1) {
 		res += "String p" + i;
 	    } else {
 		res += lp.get(i).toString() + " p" + i;
