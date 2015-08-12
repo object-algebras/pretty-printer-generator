@@ -1,5 +1,7 @@
 package pptest;
 
+import java.util.List;
+
 import anno.*;
 
 @PP
@@ -16,5 +18,7 @@ public interface ExpAlg<E> {
     @Syntax("exp = NUM")
     E lit(int n);
 
+    @Syntax("exp = 'avg' '(' exp@','+ ')'")
+    E avg(List<E> es);
 }
 

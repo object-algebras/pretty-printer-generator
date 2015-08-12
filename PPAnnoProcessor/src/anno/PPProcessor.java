@@ -119,25 +119,29 @@ public class PPProcessor extends AbstractProcessor {
 
 	int i = 0, j = 2;
 	while (j < synList.length) {
-	    while (synList[j].startsWith("\'")) {
-		res += synList[j];// .substring(1, synList[j].length() - 1);
+	    while (j < synList.length && synList[j].startsWith("\'")) {
+		res += "\"" + synList[j].substring(1, synList[j].length() - 1)
+			+ "\"";
 		j++;
-		res += " + ";
+		if (j < synList.length)
+		    res += " + ";
 	    }
-	    j++;
-	    String paramName = "p" + i;
-	    if (AnnoUtils.arrayContains(lListTypeArgs, params.get(i).asType()
-		    .toString()) != -1) {
-		res += paramName + ".toString()";
-	    } else if (AnnoUtils.arrayContains(lTypeArgs, params.get(i)
-		    .asType().toString()) != -1) {
-		res += paramName;
-	    } else {
-		res += "\"\" + " + paramName;
+	    if (j < synList.length) {
+		j++;
+		String paramName = "p" + i;
+		if (AnnoUtils.arrayContains(lListTypeArgs, params.get(i)
+			.asType().toString()) != -1) {
+		    res += paramName + ".toString()";
+		} else if (AnnoUtils.arrayContains(lTypeArgs, params.get(i)
+			.asType().toString()) != -1) {
+		    res += paramName;
+		} else {
+		    res += "\"\" + " + paramName;
+		}
+		i++;
+		if (j < synList.length)
+		    res += " + ";
 	    }
-	    i++;
-	    if (i < params.size())
-		res += " + ";
 	}
 
 	res += ";\n";
@@ -145,19 +149,19 @@ public class PPProcessor extends AbstractProcessor {
 
 	/* print debugging info */
 	res += "/* \n";
+	res += "params.size(): " + params.size();
+	res += "synList.length: " + synList.length;
 	res += "e.getParameters(): " + e.getParameters() + "\n";
 	for (VariableElement param : params) {
-	    res += param.toString() + param.asType() + "\n";
+	    res += param.toString() + ": " + param.asType() + "\n";
 	}
 	res += "typeArgs: " + typeArgs + "\n";
-	res += "lListTypeArgs: " + lListTypeArgs + "\n";
-	res += e.getAnnotation(Syntax.class).value() + "\n";
-	res += "synList: ";
-	for (String s : synList) {
-	    res += s;
-	    res += ",";
+	res += "lListTypeArgs: ";
+	for (String t : lListTypeArgs) {
+	    res += t + ", ";
 	}
 	res += "\n";
+	res += e.getAnnotation(Syntax.class).value() + "\n";
 	res += "\n */ \n";
 	return res;
     }

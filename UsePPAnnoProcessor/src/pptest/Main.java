@@ -1,5 +1,7 @@
 package pptest;
 
+import java.util.ArrayList;
+
 import ppgen.PPExpAlg;
 import anno.*;
 
@@ -26,8 +28,20 @@ public class Main {
 	return alg.add(alg.lit(3), alg.mul(alg.lit(4), alg.lit(5)));
     }
 
+    static <E> E make2(ExpAlg<E> alg) {
+	ArrayList<E> list = new ArrayList<E>();
+	list.add(alg.lit(5));
+	list.add(alg.lit(6));
+	list.add(alg.lit(7));
+	list.add(alg.lit(8));
+	return alg.avg(list);
+    }
+
     public static void main(String[] args) {
 	String e1pp = make(new PPExpAlg());
 	System.out.println(e1pp);
+
+	String e2pp = make2(new PPExpAlg());
+	System.out.println(e2pp);
     }
 }
