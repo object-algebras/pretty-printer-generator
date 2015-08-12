@@ -1,6 +1,6 @@
 package pptest;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import ppgen.PPExpAlg;
 import anno.*;
@@ -43,5 +43,12 @@ public class Main {
 
 	String e2pp = make2(new PPExpAlg());
 	System.out.println(e2pp);
+
+	/******
+	 * List<String> list = Arrays.asList("5", "6", "7", "8"); String joined
+	 * = String.join("+", list); System.out.println(list);
+	 * System.out.println(joined);
+	 *******/
+
     }
 }

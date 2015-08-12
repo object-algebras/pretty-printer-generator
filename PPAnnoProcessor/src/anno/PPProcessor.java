@@ -127,18 +127,30 @@ public class PPProcessor extends AbstractProcessor {
 		    res += " + ";
 	    }
 	    if (j < synList.length) {
-		j++;
 		String paramName = "p" + i;
+		String str = synList[j];
+		if (str.contains("@")) {
+		    String separator = getSeparator(synList[j]);
+		    if (AnnoUtils.arrayContains(lListTypeArgs, params.get(i)
+			    .asType().toString()) != -1) {
+			res += "String.join(\"" + separator + "\", "
+				+ paramName + ")";
+		    } else {
+			// TODO: error: list type does not match!
+		    }
+		}
+
 		if (AnnoUtils.arrayContains(lListTypeArgs, params.get(i)
 			.asType().toString()) != -1) {
-		    res += paramName + ".toString()";
+		    // TODO: error: list type does not match!
 		} else if (AnnoUtils.arrayContains(lTypeArgs, params.get(i)
 			.asType().toString()) != -1) {
 		    res += paramName;
-		} else {
+		} else { // int, bool, float....
 		    res += "\"\" + " + paramName;
 		}
 		i++;
+		j++;
 		if (j < synList.length)
 		    res += " + ";
 	    }
@@ -164,6 +176,12 @@ public class PPProcessor extends AbstractProcessor {
 	res += e.getAnnotation(Syntax.class).value() + "\n";
 	res += "\n */ \n";
 	return res;
+    }
+
+    private String getSeparator(String str) {
+	// getSeparator( "exp@','+" ) ---> ","
+	int i = str.indexOf("@");
+	return str.substring(i + 2, i + 3);
     }
 
     @Override
